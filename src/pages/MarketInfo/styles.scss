@@ -1,25 +1,29 @@
-.market-info-page {
-  width: 100vm;
-  height: 100vh;
+.market {
   display: flex;
   flex-direction: column;
   align-items: center;
 
-  .header-title {
+  &__title {
     font-family: sans-serif;
     font-size: 25px;
     font-weight: 800;
     color: #000000;
     margin: 50px 0 20px;
   }
-  .update-container {
+
+  &__section {
+    width: 1300px;
+    height: 550px;
+  }
+
+  &__timer {
     text-align: left;
     margin-bottom: 10px;
+  }
 
-    .update-label {
-      font-family: sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-    }
+  &__timer-label {
+    font-family: sans-serif;
+    font-size: 13px;
+    font-weight: 600;
   }
 }

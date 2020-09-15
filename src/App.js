@@ -1,5 +1,5 @@
 import React from 'react';
-import MarketInfo from './pages/MarketInfo';
+import { MarketInfo } from './pages/MarketInfo';
 import './styles/base.scss';
 
 function App() {
