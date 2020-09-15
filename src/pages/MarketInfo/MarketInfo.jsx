@@ -1,27 +1,10 @@
 import React, {
   useCallback, useEffect, useRef, useState,
 } from 'react';
-import { AgGridReact } from 'ag-grid-react';
+import { AgGridReact, AgGridColumn } from 'ag-grid-react';
 import { AllCommunityModules } from '@ag-grid-community/all-modules';
-import data from '../../mockup/marketinfo.json';
+import apiHandler from '../../apis';
 import './styles.scss';
-
-const marketInfo = data.map((item, index) => ({
-  no: index + 1,
-  ...item,
-}));
-
-const columns = [
-  { headerName: 'No', field: 'no' },
-  { headerName: 'From', field: 'from' },
-  { headerName: 'To', field: 'to' },
-  { headerName: 'Rate', field: 'rate' },
-  { headerName: 'Order Expire', field: 'orderExpiresIn' },
-  { headerName: 'Status', field: 'status' },
-  { headerName: 'Max', field: 'max' },
-  { headerName: 'Min', field: 'min' },
-  { headerName: 'Min Configuration', field: 'minConf' },
-];
 
 const timeSteps = [
   { value: 5, label: '5s' },
@@ -34,27 +17,12 @@ export const MarketInfo = () => {
   const [updateStep, setUpdateStep] = useState(5);
   const updateTimer = useRef();
 
-  const autoSizeAll = (api) => {
-    const allColumnIds = [];
-    api.getAllColumns().forEach((column) => {
-      allColumnIds.push(column.colId);
-    });
-    api.autoSizeColumns(allColumnIds, false);
-  };
-
-  const onGridReady = (params) => {
-    setRowData(marketInfo);
-    autoSizeAll(params.columnApi);
-  };
-
   const updateData = useCallback(() => {
-    if (rowData.length) {
-      const updatedData = rowData.map((dataItem) => ({
-        ...dataItem,
-        rate: dataItem.rate + 1,
-      }));
-      setRowData(updatedData);
-    }
+    const updatedData = rowData.map((dataItem) => ({
+      ...dataItem,
+      rate: dataItem.rate + 1,
+    }));
+    setRowData(updatedData);
   }, [rowData]);
 
   const handleStepSelect = useCallback((event) => {
@@ -62,6 +30,23 @@ export const MarketInfo = () => {
     clearInterval(updateTimer.current);
     updateTimer.current = setInterval(updateData, event.target.value * 1000);
   }, [updateData]);
+
+  const fetchData = async () => {
+    try {
+      const marketData = await apiHandler('get', '/swap/marketinfo');
+      const marketInfo = marketData?.data.map((info, index) => ({
+        no: index,
+        ...info,
+      }));
+      setRowData(marketInfo);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   useEffect(() => {
     updateTimer.current = setInterval(updateData, updateStep * 1000);
@@ -78,7 +63,7 @@ export const MarketInfo = () => {
           <span className="market__timer-label">Update rate every </span>
           <select value={updateStep} onChange={handleStepSelect}>
             {timeSteps.map((item) => (
-              <option value={item.value}>{item.label}</option>
+              <option key={item.value} value={item.value}>{item.label}</option>
             ))}
           </select>
         </div>
@@ -88,12 +73,20 @@ export const MarketInfo = () => {
             resizable: true,
             sortable: true,
           }}
-          columnDefs={columns}
           rowData={rowData}
-          onGridReady={onGridReady}
           paginationAutoPageSize
           pagination
-        />
+        >
+          <AgGridColumn field="no" width={90} suppressSizeToFit />
+          <AgGridColumn field="from" width={100} />
+          <AgGridColumn field="to" width={100} />
+          <AgGridColumn field="rate" width={170} type="numericColumn" />
+          <AgGridColumn field="orderExpiresIn" width={150} />
+          <AgGridColumn field="status" width={100} />
+          <AgGridColumn field="max" width={200} type="numericColumn" />
+          <AgGridColumn field="min" width={200} type="numericColumn" />
+          <AgGridColumn field="minConf" width={120} />
+        </AgGridReact>
       </div>
     </div>
   );
