@@ -1,0 +1,16 @@
+{
+   "applinks":{
+      "apps":[
+         
+      ],
+      "details":[
+         {
+            "appID":"58G3YA4YLP.com.hitscollective.hits",
+            "paths":[
+               "NOT /_/*",
+               "/*"
+            ]
+         }
+      ]
+   }
+}
